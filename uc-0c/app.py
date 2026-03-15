@@ -7,7 +7,7 @@ def search_documents(query, folder="../data/policy-documents"):
         filepath = os.path.join(folder, filename)
         with open(filepath, "r") as f:
             content = f.read()
-            if query.lower() in content.lower():
+            if query.lower() in content.lower(): 
                 results.append((filename, content[:200]))
 
     return results
