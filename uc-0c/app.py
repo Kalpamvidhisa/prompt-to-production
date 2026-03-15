@@ -1,25 +1,30 @@
-import os
+import csv
 
-def search_documents(query, folder="../data/policy-documents"):
-    results = []
+def calculate_growth(input_file, output_file):
+    rows = []
 
-    for filename in os.listdir(folder):
-        filepath = os.path.join(folder, filename)
-        with open(filepath, "r") as f:
-            content = f.read()
-            if query.lower() in content.lower(): 
-                results.append((filename, content[:200]))
+    with open(input_file, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                prev = float(row["previous"])
+                curr = float(row["current"])
+                growth = curr - prev
+                row["growth"] = growth
+            except:
+                row["growth"] = 0
+            rows.append(row)
 
-    return results
+    fieldnames = list(rows[0].keys())
 
+    with open(output_file, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print("Growth calculation complete.")
 
 if __name__ == "__main__":
-    query = input("Enter search query: ")
-    matches = search_documents(query)
-
-    if matches:
-        for file, snippet in matches:
-            print(f"\nFound in {file}:")
-            print(snippet)
-    else:
-        print("No matching documents found.")
+    input_file = "../data/budget/ward_budget.csv"
+    output_file = "growth_output.csv"
+    calculate_growth(input_file, output_file)
